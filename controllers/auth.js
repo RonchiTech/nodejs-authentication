@@ -1,5 +1,17 @@
 const User = require('../models/user');
 const bcrpyt = require('bcryptjs');
+const nodemailer = require('nodemailer');
+const nodemailerTransport = require('nodemailer-sendgrid-transport');
+
+const transporter = nodemailer.createTransport(
+  nodemailerTransport({
+    auth: {
+      api_key:
+        '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',
+    },
+  })
+);
+
 exports.getLogin = (req, res, next) => {
   let error = req.flash('error');
   if (error.length > 0) {
@@ -103,6 +115,16 @@ exports.postSignup = (req, res, next) => {
         })
         .then((result) => {
           res.redirect('/login');
+          return transporter
+            .sendMail({
+              to: email,
+              from: 'shopapp@ronchi.com',
+              subject: 'Account Confirmation',
+              html: '<h1>Congratualations! You created an account.',
+            })
+            .catch((err) => {
+              console.log(err);
+            });
         });
     })
     .catch((err) => {
