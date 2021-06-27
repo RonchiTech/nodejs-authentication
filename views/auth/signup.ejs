@@ -9,7 +9,7 @@
     <main>
         <%if(hasError){%>
             <div>
-                <p><%=hasError%></p>
+                <p class="user-message user-message__error"><%=hasError%></p>
             </div>
         <%}%>
         <form class="login-form" action="/signup" method="POST">
