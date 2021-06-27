@@ -4,7 +4,8 @@ exports.getLogin = (req, res, next) => {
   res.render('auth/login', {
     path: '/login',
     pageTitle: 'Login',
-    isAuthenticated: false,
+    // isAuthenticated: false,
+    hasError: req.flash('error')
   });
 };
 
@@ -12,7 +13,8 @@ exports.getSignup = (req, res, next) => {
   res.render('auth/signup', {
     path: '/signup',
     pageTitle: 'Signup',
-    isAuthenticated: false,
+    // isAuthenticated: false,
+    hasError: req.flash('error')
   });
 };
 
@@ -22,6 +24,7 @@ exports.postLogin = (req, res, next) => {
   User.findOne({ email: email })
     .then((user) => {
       if (!user) {
+        req.flash('error','Not a valid email')
         return res.redirect('/login');
       }
       bcrpyt
@@ -35,14 +38,17 @@ exports.postLogin = (req, res, next) => {
               res.redirect('/');
             });
           }
+          req.flash('error', 'Incorrect Password');
           res.redirect('/login')
         })
         .catch((err) => {
           console.log(err);
+          req.flash('error', 'Something went wrong...');
           return redirect('/login');
         });
     })
     .catch((err) => {
+      req.flash('error', 'Something went wrong...');
       console.log(err);
     });
 
@@ -66,7 +72,8 @@ exports.postSignup = (req, res, next) => {
   User.findOne({ email: email })
     .then((userDoc) => {
       if (userDoc) {
-        return res.redirect('/');
+        req.flash('error','Email has already been taken. Please use another one.')
+        return res.redirect('/signup');
       }
       return bcrpyt
         .hash(password, 12)
