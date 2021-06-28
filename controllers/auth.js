@@ -212,7 +212,38 @@ exports.getNewPassword = (req, res, next) => {
         // isAuthenticated: false,
         hasError: error,
         userId: user._id.toString(),
+        passwordToken: token,
       });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+exports.postNewPassword = (req, res, next) => {
+  const userId = req.body.userId;
+  const newPassword = req.body.password;
+  const passwordToken = req.body.passwordToken;
+
+  let resetUser;
+
+  User.findOne({
+    _id: userId,
+    resetToken: passwordToken,
+    resetTokenExpiration: { $gt: Date.now() },
+  })
+    .then((user) => {
+      resetUser = user;
+      return bcrpyt.hash(newPassword, 12);
+    })
+    .then((hashedPassword) => {
+      resetUser.password = hashedPassword;
+      resetUser.resetToken = undefined;
+      resetUser.resetTokenExpiration = undefined;
+      return user.save();
+    })
+    .then((result) => {
+      res.redirect('/login');
     })
     .catch((err) => {
       console.log(err);
