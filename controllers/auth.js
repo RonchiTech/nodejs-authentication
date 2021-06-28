@@ -1,13 +1,13 @@
 const User = require('../models/user');
 const bcrpyt = require('bcryptjs');
 const nodemailer = require('nodemailer');
-const nodemailerTransport = require('nodemailer-sendgrid-transport');
-
+const sendgridTransport = require('nodemailer-sendgrid-transport');
+const crypto = require('crypto');
 const transporter = nodemailer.createTransport(
-  nodemailerTransport({
+  sendgridTransport({
     auth: {
       api_key:
-        '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',
+        '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',
     },
   })
 );
@@ -152,4 +152,69 @@ exports.getReset = (req, res, next) => {
     // isAuthenticated: false,
     hasError: error,
   });
+};
+
+exports.postReset = (req, res, next) => {
+  crypto.randomBytes(32, (err, buffer) => {
+    if (err) {
+      return res.redirect('/reset');
+    }
+    const token = buffer.toString('hex');
+    User.findOne({ email: req.body.email })
+      .then((user) => {
+        if (!user) {
+          req.flash('error', 'No user found!');
+          return res.redirect('/reset');
+        }
+        user.resetToken = token;
+        user.resetTokenExpiration = Date.now() + 3600000;
+        return user.save();
+      })
+      .then((result) => {
+        res.redirect('/');
+        return transporter
+          .sendMail({
+            to: req.body.email,
+            from: 'shopapp@ronchi.com',
+            subject: 'Password Reset',
+            html: `
+              <p>You requested a password reset</p>
+              <p>Click this <a href="http://localhost:3000/reset/${token}">Link</a> to set a new password.</p>
+            `,
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  });
+};
+
+exports.getNewPassword = (req, res, next) => {
+  const token = req.params.tokenId;
+
+  User.findOne({
+    resetToken: token,
+    resetTokenExpiration: { $gt: Date.now() },
+  })
+    .then((user) => {
+      let error = req.flash('error');
+      if (error.length > 0) {
+        error = error[0];
+      } else {
+        error = null;
+      }
+      res.render('auth/new-password', {
+        path: '/new-password',
+        pageTitle: 'New Password',
+        // isAuthenticated: false,
+        hasError: error,
+        userId: user._id.toString(),
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
