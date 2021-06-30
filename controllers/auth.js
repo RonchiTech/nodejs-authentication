@@ -3,9 +3,7 @@ const bcrpyt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const sendgridTransport = require('nodemailer-sendgrid-transport');
 const crypto = require('crypto');
-const { validationResult } = require('express-validator/check')
-
-
+const { validationResult } = require('express-validator/check');
 
 const transporter = nodemailer.createTransport(
   sendgridTransport({
@@ -97,9 +95,9 @@ exports.postSignup = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
   const confirmPassword = req.body.confirmPassword;
-  const errors = validationResult(req)
+  const errors = validationResult(req);
   console.log(errors);
-  if(!errors.isEmpty()) {
+  if (!errors.isEmpty()) {
     return res.status(422).render('auth/signup', {
       path: '/signup',
       pageTitle: 'Signup',
@@ -107,38 +105,27 @@ exports.postSignup = (req, res, next) => {
       hasError: errors.array()[0].msg,
     });
   }
-
-  User.findOne({ email: email })
-    .then((userDoc) => {
-      if (userDoc) {
-        req.flash(
-          'error',
-          'Email has already been taken. Please use another one.'
-        );
-        return res.redirect('/signup');
-      }
-      return bcrpyt
-        .hash(password, 12)
-        .then((hashedPassword) => {
-          const user = new User({
-            email: email,
-            password: hashedPassword,
-            cart: { items: [] },
-          });
-          return user.save();
+  bcrpyt
+    .hash(password, 12)
+    .then((hashedPassword) => {
+      const user = new User({
+        email: email,
+        password: hashedPassword,
+        cart: { items: [] },
+      });
+      return user.save();
+    })
+    .then((result) => {
+      res.redirect('/login');
+      return transporter
+        .sendMail({
+          to: email,
+          from: 'shopapp@ronchi.com',
+          subject: 'Account Confirmation',
+          html: '<h1>Congratualations! You created an account.',
         })
-        .then((result) => {
-          res.redirect('/login');
-          return transporter
-            .sendMail({
-              to: email,
-              from: 'shopapp@ronchi.com',
-              subject: 'Account Confirmation',
-              html: '<h1>Congratualations! You created an account.',
-            })
-            .catch((err) => {
-              console.log(err);
-            });
+        .catch((err) => {
+          console.log(err);
         });
     })
     .catch((err) => {
