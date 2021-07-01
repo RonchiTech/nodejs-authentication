@@ -41,6 +41,11 @@ exports.getSignup = (req, res, next) => {
     pageTitle: 'Signup',
     // isAuthenticated: false,
     hasError: error,
+    oldInput: {
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
   });
 };
 
@@ -113,6 +118,11 @@ exports.postSignup = (req, res, next) => {
       pageTitle: 'Signup',
       // isAuthenticated: false,
       hasError: errors.array()[0].msg,
+      oldInput: {
+        email,
+        password,
+        confirmPassword: req.body.confirmPassword,
+      },
     });
   }
   bcrpyt
