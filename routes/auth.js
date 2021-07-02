@@ -14,13 +14,14 @@ router.get('/reset', authController.getReset);
 router.post(
   '/login',
   [
-    body('email').isEmail().withMessage('Invalid Email'),
+    body('email').isEmail().withMessage('Invalid Email').normalizeEmail(),
     body(
       'password',
       'Password should be at least 5 characters and with only numbers and text'
     )
       .isLength({ min: 5 })
-      .isAlphanumeric(),
+      .isAlphanumeric()
+      .trim(),
   ],
   authController.postLogin
 );
@@ -43,14 +44,16 @@ router.post(
             );
           }
         });
-      }),
+      })
+      .normalizeEmail(),
     body(
       'password',
       'Password should be at least 5 characters and with only numbers and text'
     )
       .isLength({ min: 5 })
-      .isAlphanumeric(),
-    body('confirmPassword').custom((value, { req }) => {
+      .isAlphanumeric()
+      .trim(),
+    body('confirmPassword').trim().custom((value, { req }) => {
       if (value !== req.body.password) {
         throw new Error('Passwords have to match!');
       }
