@@ -91,9 +91,14 @@ exports.postLogin = (req, res, next) => {
         });
     })
     .catch((err) => {
-      // req.flash('error', 'Something went wrong...');
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
+    // .catch((err) => {
+    //   // req.flash('error', 'Something went wrong...');
+    //   console.log(err);
+    // });
 
   // User.findById('5bab316ce0a7c75f783cb8a8')
   //   .then((user) => {
@@ -151,7 +156,9 @@ exports.postSignup = (req, res, next) => {
         });
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -210,7 +217,9 @@ exports.postReset = (req, res, next) => {
           });
       })
       .catch((err) => {
-        console.log(err);
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
       });
   });
 };
@@ -239,7 +248,9 @@ exports.getNewPassword = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -269,6 +280,8 @@ exports.postNewPassword = (req, res, next) => {
       res.redirect('/login');
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
