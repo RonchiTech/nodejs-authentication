@@ -3,7 +3,7 @@ const path = require('path');
 const express = require('express');
 
 const shopController = require('../controllers/shop');
-const routeProtection = require('../middleware/routeProtection')
+const routeProtection = require('../middleware/routeProtection');
 const router = express.Router();
 
 router.get('/', shopController.getIndex);
@@ -25,5 +25,7 @@ router.post(
 router.post('/create-order', routeProtection, shopController.postOrder);
 
 router.get('/orders', routeProtection, shopController.getOrders);
+
+router.get('/orders/:orderId', routeProtection, shopController.getInvoice);
 
 module.exports = router;
