@@ -1,5 +1,6 @@
 const Product = require('../models/product');
-const mongoose = require('mongoose')
+// const mongoose = require('mongoose')
+
 exports.getAddProduct = (req, res, next) => {
   res.render('admin/edit-product', {
     pageTitle: 'Add Product',
@@ -10,13 +11,15 @@ exports.getAddProduct = (req, res, next) => {
 
 exports.postAddProduct = (req, res, next) => {
   const title = req.body.title;
-  const imageUrl = req.body.imageUrl;
+  const imageUrl = req.file;
   const price = req.body.price;
   const description = req.body.description;
+  console.log(imageUrl);
   const user = {
     userId: req.user._id,
     userEmail: req.user.email,
   };
+ 
   const product = new Product({
     // _id: new mongoose.Types.ObjectId('60d9f387b9ca750e283448fd'),
     title: title,
