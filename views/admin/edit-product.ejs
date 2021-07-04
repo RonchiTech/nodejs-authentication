@@ -7,6 +7,11 @@
    <%- include('../includes/navigation.ejs') %>
 
     <main>
+         <%if(hasError){%>
+        <div>
+            <p class="user-message user-message__error"><%= errorMessage %></p>
+        </div>
+        <%}%>
         <form class="product-form" action="/admin/<% if (editing) { %>edit-product<% } else { %>add-product<% } %>" method="POST" enctype="multipart/form-data">
             <div class="form-control">
                 <label for="title">Title</label>

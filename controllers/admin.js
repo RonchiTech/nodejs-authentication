@@ -6,20 +6,45 @@ exports.getAddProduct = (req, res, next) => {
     pageTitle: 'Add Product',
     path: '/admin/add-product',
     editing: false,
+    hasError: false,
+    product: {
+      title: '',
+      price: null,
+      description: '',
+    },
+    errorMessage: '',
+    validationErrors: [],
   });
 };
 
 exports.postAddProduct = (req, res, next) => {
   const title = req.body.title;
-  const imageUrl = req.file;
+  const image = req.file;
   const price = req.body.price;
   const description = req.body.description;
-  console.log(imageUrl);
+  console.log(image);
+
+  if (!image) {
+    return res.status(422).render('admin/edit-product', {
+      pageTitle: 'Add Product',
+      path: '/admin/add-product',
+      editing: false,
+      hasError: true,
+      product: {
+        title,
+        price,
+        description,
+      },
+      errorMessage: 'File attached is not an image',
+      validationErrors: [],
+    });
+  }
+  const imageUrl = image.path;
   const user = {
     userId: req.user._id,
     userEmail: req.user.email,
   };
- 
+
   const product = new Product({
     // _id: new mongoose.Types.ObjectId('60d9f387b9ca750e283448fd'),
     title: title,
@@ -40,15 +65,17 @@ exports.postAddProduct = (req, res, next) => {
       // res.redirect('/500');
       const error = new Error(err);
       error.httpStatusCode = 500;
-      return next(error)
+      return next(error);
     });
 };
 
 exports.getEditProduct = (req, res, next) => {
+  // console.log('rendered');
   const editMode = req.query.edit;
   if (!editMode) {
     return res.redirect('/');
   }
+  // console.log('rendered');
   const prodId = req.params.productId;
   Product.findById(prodId)
     .then((product) => {
@@ -61,20 +88,23 @@ exports.getEditProduct = (req, res, next) => {
         path: '/admin/edit-product',
         editing: editMode,
         product: product,
+        hasError: false,
+        errorMessage: null,
+        validationErrors: [],
       });
     })
     .catch((err) => {
+      // console.log('HAS ERR',err);
       const error = new Error(err);
       error.httpStatusCode = 500;
       return next(error);
     });
-};
-
+}
 exports.postEditProduct = (req, res, next) => {
   const prodId = req.body.productId;
   const updatedTitle = req.body.title;
   const updatedPrice = req.body.price;
-  const updatedImageUrl = req.body.imageUrl;
+  const image = req.file;
   const updatedDesc = req.body.description;
 
   Product.findById(prodId)
@@ -85,7 +115,9 @@ exports.postEditProduct = (req, res, next) => {
       product.title = updatedTitle;
       product.price = updatedPrice;
       product.description = updatedDesc;
-      product.imageUrl = updatedImageUrl;
+      if (image) {
+        product.imageUrl = image.path;
+      }
       return product.save().then((result) => {
         console.log('UPDATED PRODUCT!');
         res.redirect('/admin/products');

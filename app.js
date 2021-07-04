@@ -46,8 +46,7 @@ const fileFilter = (req, file, cb) => {
     cb(null,true);
   } else {
     cb(null, false);
-  }
-    
+  } 
 };
 
 app.set('view engine', 'ejs');
@@ -107,13 +106,13 @@ app.use(errorController.get404);
 
 app.use((error, req, res, next) => {
   // res.status(error.httpStatusCode).render('/')
-  res.redirect('/500');
-  // res.status(500).render('500', {
-  //   pageTitle: 'Something went wrong!',
-  //   path: '/500',
-  //   isAuthenticated: req.session.isLoggedIn,
-  //   // isAuthenticated: req.session.isLoggedIn,
-  // });
+  // res.redirect('/500');
+  res.status(500).render('500', {
+    pageTitle: 'Oops,Something went wrong!',
+    path: '/500',
+    isAuthenticated: req.session.isLoggedIn,
+    // isAuthenticated: req.session.isLoggedIn,
+  });
 });
 
 mongoose
