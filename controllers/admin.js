@@ -1,6 +1,6 @@
 const Product = require('../models/product');
 // const mongoose = require('mongoose')
-
+const fileUtil = require('../util/file');
 exports.getAddProduct = (req, res, next) => {
   res.render('admin/edit-product', {
     pageTitle: 'Add Product',
@@ -99,7 +99,7 @@ exports.getEditProduct = (req, res, next) => {
       error.httpStatusCode = 500;
       return next(error);
     });
-}
+};
 exports.postEditProduct = (req, res, next) => {
   const prodId = req.body.productId;
   const updatedTitle = req.body.title;
@@ -116,6 +116,7 @@ exports.postEditProduct = (req, res, next) => {
       product.price = updatedPrice;
       product.description = updatedDesc;
       if (image) {
+        fileUtil.deleteFile(product.imageUrl);
         product.imageUrl = image.path;
       }
       return product.save().then((result) => {
@@ -151,7 +152,14 @@ exports.getProducts = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.deleteOne({ _id: prodId, 'user.userId': req.user._id })
+  Product.findById(prodId)
+    .then((product) => {
+      if (!product) {
+        return next(new Error('No Product Found'));
+      }
+      fileUtil.deleteFile(product.imageUrl);
+      return Product.deleteOne({ _id: prodId, 'user.userId': req.user._id });
+    })
     .then(() => {
       console.log('DESTROYED PRODUCT');
       res.redirect('/admin/products');
