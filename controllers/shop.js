@@ -160,27 +160,35 @@ exports.getInvoice = (req, res, next) => {
       }
       const invoiceName = `invoice-${orderId}.pdf`;
       const invoicePath = path.join('data', 'invoice', invoiceName);
-      fs.readFile(invoicePath, (err, data) => {
-        if (err) {
-          return next(err);
-          // return console.log('ATAY');
-        }
-        console.log(data);
-        res.setHeader('Content-type', 'application/pdf');
-        res.setHeader(
-          'Content-disposition',
-          'inline;filename="' + invoiceName + '"'
-        );
-        // res.setHeader(
-        //   'Content-disposition',
-        //   'attachment;filename="' + invoiceName + '"'
-        // );
-        res.send(data);
-      });
+
+      const file = fs.createReadStream(invoicePath);
+      res.setHeader('Content-type', 'application/pdf');
+      res.setHeader(
+        'Content-disposition',
+        'inline;filename="' + invoiceName + '"'
+      );
+      file.pipe(res);
+      // fs.readFile(invoicePath, (err, data) => {
+      //   if (err) {
+      //     return next(err);
+      //     // return console.log('ATAY');
+      //   }
+      //   console.log(data);
+      //   res.setHeader('Content-type', 'application/pdf');
+      //   res.setHeader(
+      //     'Content-disposition',
+      //     'inline;filename="' + invoiceName + '"'
+      //   );
+      //   // res.setHeader(
+      //   //   'Content-disposition',
+      //   //   'attachment;filename="' + invoiceName + '"'
+      //   // );
+      //   res.send(data);
+      // });
     })
     .catch((err) => {
       // next(err);
-      res.redirect('/404')
+      res.redirect('/404');
       // console.log('ERR',err);
     });
 };
