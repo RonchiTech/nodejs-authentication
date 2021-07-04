@@ -170,7 +170,18 @@ exports.getInvoice = (req, res, next) => {
       );
       doc.pipe(fs.createWriteStream(invoicePath));
       doc.pipe(res);
-      doc.text('Hello Ako Budoy');
+      doc.fontSize(25).text('Orders', {
+        underline: true,
+      }); 
+      let totalPrice = 0;
+      order.products.forEach((prod) => {
+        totalPrice += prod.product.price * prod.quantity;
+        doc.fontSize(14).text(
+          `${prod.product.title}  -  ${prod.quantity}pcs x \$${prod.product.price}`
+        );
+      });
+      doc.text('------------------------------------------------------')
+      doc.text(`Total Price: \$${totalPrice}`)
       doc.end();
 
       // const file = fs.createReadStream(invoicePath);
