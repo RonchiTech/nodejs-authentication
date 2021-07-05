@@ -243,10 +243,26 @@ form {
 }
 .user-message__error {
   background: #db4343;
-   border: 1px solid #ff6161;
-  color: #FFFCFF
+  border: 1px solid #ff6161;
+  color: #fffcff;
+}
+.pagination {
+  margin-top: 2rem;
+  text-align: center;
+}
+.pagination a {
+  text-decoration: none;
+  color: #00695c;
+  padding: 0.5rem;
+  border: 1px solid #00695c;
+  margin: 0 1rem;
 }
 
+.pagination a:hover,
+.pagination a:active {
+  background: #00695c;
+  color: #fff;
+}
 @media (min-width: 768px) {
   .main-header__nav {
     display: flex;
@@ -256,6 +272,6 @@ form {
     display: none;
   }
   .user-message {
-  width: 30rem;
-}
+    width: 30rem;
+  }
 }

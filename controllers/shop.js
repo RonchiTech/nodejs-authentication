@@ -4,6 +4,8 @@ const path = require('path');
 const Product = require('../models/product');
 const Order = require('../models/order');
 
+const ITEMS_PER_PAGE = 2;
+
 const PDFDocument = require('pdfkit');
 exports.getProducts = (req, res, next) => {
   Product.find()
@@ -40,7 +42,10 @@ exports.getProduct = (req, res, next) => {
 };
 
 exports.getIndex = (req, res, next) => {
+  const page = req.query.page;
   Product.find()
+    .skip((page -1) * ITEMS_PER_PAGE)
+    .limit(ITEMS_PER_PAGE)
     .then((products) => {
       res.render('shop/index', {
         prods: products,
@@ -172,16 +177,18 @@ exports.getInvoice = (req, res, next) => {
       doc.pipe(res);
       doc.fontSize(25).text('Orders', {
         underline: true,
-      }); 
+      });
       let totalPrice = 0;
       order.products.forEach((prod) => {
         totalPrice += prod.product.price * prod.quantity;
-        doc.fontSize(14).text(
-          `${prod.product.title}  -  ${prod.quantity}pcs x \$${prod.product.price}`
-        );
+        doc
+          .fontSize(14)
+          .text(
+            `${prod.product.title}  -  ${prod.quantity}pcs x \$${prod.product.price}`
+          );
       });
-      doc.text('------------------------------------------------------')
-      doc.text(`Total Price: \$${totalPrice}`)
+      doc.text('------------------------------------------------------');
+      doc.text(`Total Price: \$${totalPrice}`);
       doc.end();
 
       // const file = fs.createReadStream(invoicePath);
