@@ -7,16 +7,21 @@ const deleteProductBtn = (btn) => {
   fetch(`/admin/product/${prodId}`, {
     method: 'DELETE',
     headers: {
-      csrf_token: csrf,
+      'csrf-token': csrf,
     },
   })
     .then((result) => {
       console.log(result);
+      return result.json();
+    })
+    .then(data => {
+      console.log(data);
+      productElement.parentNode.removeChild(productElement);
     })
     .catch((err) => {
       console.log(err);
     });
-    
+
   // fetch(`/admin/product/${prodId}`, {
   //   method: 'DELETE',
   //   headers: {
