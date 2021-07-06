@@ -52,6 +52,8 @@ const fileFilter = (req, file, cb) => {
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
+
+
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
@@ -68,7 +70,6 @@ app.use(
     store: store,
   })
 );
-
 app.use(csrfProtection);
 app.use(flash());
 
@@ -99,8 +100,9 @@ app.use((req, res, next) => {
 });
 
 app.use('/admin', adminRoutes);
-app.use(shopRoutes);
 app.use(authRoutes);
+app.use(shopRoutes);
+
 app.use('/500', errorController.get500);
 app.use(errorController.get404);
 
@@ -111,7 +113,6 @@ app.use((error, req, res, next) => {
     pageTitle: 'Oops,Something went wrong!',
     path: '/500',
     isAuthenticated: req.session.isLoggedIn,
-    // isAuthenticated: req.session.isLoggedIn,
   });
 });
 

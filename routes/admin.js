@@ -19,7 +19,9 @@ router.get('/edit-product/:productId',routeProtection, adminController.getEditPr
 
 router.post('/edit-product', routeProtection,adminController.postEditProduct);
 
-router.post('/delete-product',routeProtection, adminController.postDeleteProduct);
+// router.post('/delete-product',routeProtection, adminController.postDeleteProduct);
 
-router.get('/order')
+router.delete('/product/:productId',routeProtection, adminController.deleteProduct);
+
+// router.get('/order')
 module.exports = router;
